@@ -1,0 +1,10 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block body %}
+    <div class="embed-responsive embed-responsive-16by9">
+        <iframe class="embed-responsive-item embed-responsive embed-responsive-16by9 z-depth-1-half"
+                frameborder="0"
+                src="https://www.youtube.com/embed/{{ movie.videoUrl }}"
+                allowscriptaccess="always" allow="autoplay"></iframe>
+    </div>
+{% endblock %}

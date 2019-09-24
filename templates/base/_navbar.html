@@ -1,0 +1,30 @@
+<nav class="navbar sticky-top navbar-expand-lg px-5 d-none d-md-block"
+     style="margin-top: -40px; background-color: rgba(0, 0, 0, 0.5);">
+    <div class="row">
+        <a class="navbar-brand text-white" style="margin-top: 7px;" href="{% url 'movies:movie_list' %}">
+            <i class="fa fa-film"></i>
+            <strong>MOVIE SITE</strong>
+        </a>
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">영화편집</a>
+                    </li>
+                {% endif %}
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'accounts:user_detail' user.username %}">마이페이지</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'accounts:logout' %}">로그아웃</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'accounts:login' %}">로그인</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

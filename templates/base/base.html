@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>MOVIE SITE</title>
+    {% include 'base/_cdns.html' %}
+</head>
+<body class="d-flex flex-column h-100"
+      style="font-family: 'Do Hyeon', sans-serif; font-size: 25px; background-color: lightgray;">
+{% block body %}
+
+{% endblock %}
+{% include 'base/_footer.html' %}
+{% include 'base/_scripts.html' %}
+<script>
+    new Vue({
+        el: '#searchMovie',
+        delimiters: ['{', '}'],
+        data: {
+            userId: 0,
+            search: '',
+            selected: '',
+            trailerUrl: '',
+            targettrailerUrl: '',
+            movieDetail: {},
+            movies: [],
+            top10: [],
+            scores_set: [],
+            inputScore: {
+                review: '',
+                value: '',
+            },
+            hasUserScore: '',
+            userScore: {}
+        },
+        methods: {
+            openModal(id) {
+                return `modal fade bd-${id}-modal-xl mt-5`
+            },
+            async getScore(id) {
+                const URL = `http://127.0.0.1:8000/movies/${id}/scores/`;
+                const res = await axios.get(URL);
+                this.scores_set = res.data;
+                this.hasUserScore = '';
+                this.inputScore.review = '';
+                this.inputScore.value = '';
+                this.userScore = {};
+                this.checkHasUserScore()
+            },
+            async getVideo(id) {
+                const URL = `http://127.0.0.1:8000/movies/${id}/video/`;
+                const res = await axios.get(URL);
+                console.log(res.data);
+                this.movieDetail = res.data.movie;
+                console.log('this is movieDetail')
+                console.log(this.movieDetail);
+                console.log('end')
+            },
+            async postScore(movieId) {
+                const URL = `http://127.0.0.1:8000/movies/${movieId}/scores/new/`;
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+                axios.post(URL, {
+                    'inputScore': this.inputScore
+                })
+                    .then(res => {
+                        this.inputScore.review = '';
+                        this.inputScore.value = 0;
+                        this.scores_set.scores.push(res.data.score);
+                        this.getScore(res.data.movie.id)
+                    })
+            },
+            getStr(str1 = '', needs, str2 = '') {
+                return str1 + `${needs}` + str2
+            },
+            async deleteScore(movieId, scoreId) {
+                const URL = `http://127.0.0.1:8000/movies/${movieId}/scores/${scoreId}/delete/`;
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                const res = await axios.post(URL, {});
+                if (res.data.done === true) {
+                    this.getScore(movieId)
+                }
+            },
+            checkHasUserScore() {
+                for (score of this.scores_set.scores) {
+                    if (score.user === this.userId) {
+                        this.hasUserScore = true;
+                        this.userScore = score;
+                        this.inputScore.review = this.userScore.review;
+                        this.inputScore.value = this.userScore.value;
+                        break
+                    }
+                }
+            },
+            async editScore(movieId, scoreId) {
+                const URL = `http://127.0.0.1:8000/movies/${movieId}/scores/${scoreId}/edit/`;
+                axios.defaults.xsrfCookieName = 'csrftoken';
+                axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+                const res = await axios.post(URL, {
+                    'inputScore': this.inputScore,
+                    'preScore': this.userScore
+                });
+                this.getScore(movieId)
+            },
+        },
+        watch: {
+            async search(keyword) {
+                if (keyword) {
+                    const res = await axios.get(`http://127.0.0.1:8000/movies/sort_movie/${keyword}`);
+                    this.movies = res.data.movie_set;
+                } else {
+                    const res = await axios.get('http://127.0.0.1:8000/movies/all_movies/')
+                    this.movies = res.data.movie_set;
+                }
+            },
+            async selected(option) {
+                if (option === '최신순 보기') {
+                    const sortedMovies = this.movies.sort(function (a, b) {
+                        return b['openDt'] - a['openDt']
+                        this.movies = sortedMovies;
+                    })
+                } else if (option === '평점순 보기') {
+                    const sortedMovies = this.movies.sort(function (a, b) {
+                        return b['avgScore'] - a['avgScore'];
+                        this.movies = sortedMovies;
+                    })
+                } else if (option === '관객순 보기') {
+                    const sortedMovies = this.movies.sort(function (a, b) {
+                        return b['audiAcc'].split(',').join('') * 1 - a['audiAcc'].split(',').join('') * 1;
+                        this.movies = sortedMovies;
+                    })
+                }
+            },
+            scores_set: {
+                deep: true,
+                handler: function () {
+                    axios.get('http://127.0.0.1:8000/movies/all_movies/')
+                        .then(res => {
+                            this.movies = res.data.movie_set;
+                            this.top10 = res.data.top10;
+                            this.userId = res.data.userId;
+                        })
+                }
+
+            }
+        },
+        async created() {
+            const res = await axios.get('http://127.0.0.1:8000/movies/all_movies/');
+            this.movies = res.data.movie_set;
+            this.top10 = res.data.top10;
+            this.userId = res.data.userId;
+        }
+    })
+</script>
+</body>
+</html>

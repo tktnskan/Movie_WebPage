@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% block body %}
+    {% include 'base/_navbar.html' %}
+    <div id="searchMovie" class="" style="min-height: 85vh">
+        <br>
+        <br>
+        <br>
+        <div class="col-4 wrapper signup mx-auto" style="margin-top: -30px; margin-bottom: -30px; height: 78vh;">
+            <div class="main_poster">
+                <img src="https://www.yenicikanlar.com.tr/wp-content/uploads/2018/01/about-time-2013.jpg" width="100%"
+                     alt="">
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="signup_form mt-5">
+                    {% bootstrap_form user_form %}
+                </div>
+                <div>
+                    {% if error_message %}
+                        <p style="font-size: 17px;">{{ error_message }}</p>
+                    {% endif %}
+                </div>
+                <div class="signup-button mt-5">
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary btn-block">회 원 가 입</button>
+                    {% endbuttons %}
+                </div>
+            </form>
+            {#        <a href="{% url 'accounts:login' %}" class="btn btn-danger btn-block">로 그 인 하 러 가 기</a>#}
+        </div>
+    </div>
+{% endblock %}

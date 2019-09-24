@@ -1,0 +1,28 @@
+{% extends 'base/base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block body %}
+    <div class="col-4 wrapper login mx-auto" style="margin-top: 50px; margin-bottom: -40px; height: 81vh;">
+        <div class="main_poster">
+            <img src="https://www.yenicikanlar.com.tr/wp-content/uploads/2018/01/about-time-2013.jpg" width="100%" alt="">
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="login_form mt-5">
+                {% bootstrap_form login_form %}
+            </div>
+            {% if error_message1 and error_message2 %}
+                <p style="font-size: 17px">{{ error_message1 }}</p>
+                <p style="font-size: 17px">{{ error_message2 }}</p>
+            {% endif %}
+            <div class="login-button mt-4">
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary btn-block">로 그 인</button>
+                {% endbuttons %}
+            </div>
+        </form>
+        <a href="{% url 'accounts:signup' %}" class="btn btn-danger btn-block">회 원 가 입</a>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+<aside class="d-none ml-3 d-md-block sidebar"
+       style="margin-top: -53px; position: -webkit-sticky; position: sticky; top: 100px;">
+    <nav class="sidebar-sticky mt-3">
+        <div class="nav flex-column" style="background-color: black; height: 100px; border-radius: 4px">
+            <div class="nav-item mt-2 text-center">
+                <p style="color:white; font-size: 25px; margin-top: 10px;"><strong>BOX OFFICE TOP 10</strong></p>
+            </div>
+        </div>
+        <ul class="nav flex-column mb-2">
+            <li v-for="top in top10" class="nav-item mt-2">
+                <a href="" data-toggle="modal" :data-target="getStr('.bd-', top.id, '-modal-xl')">
+                    <button @click="getScore(top.id)" class="btn btn-outline-dark btn-md btn-block" type="button" data-toggle="collapse"
+                            :data-target="getStr('#co', top.id)">{ top.movieNm }
+                    </button>
+                </a>
+{#                <div class="collapse" :id="getStr('co', top.id)">#}
+{#                    <div class="card card-body" style="background-color: rgba(0,0,0,0.1);">#}
+{#                        <a href="" data-toggle="modal" :data-target="trailerUrl">#}
+{#                            <button @click="getVideoUrl(top.videoUrl)" type="button" class="btn btn-outline-dark btn-md btn-block mb-2">#}
+{#                                예고편 보기#}
+{#                            </button>#}
+{#                        </a>#}
+{#                        <a href="" data-toggle="modal" :data-target="getStr('.bd-', top.id, '-modal-xl')">#}
+{#                            <button @click="getScore(top.id)" class="btn btn-outline-dark btn-md btn-block"#}
+{#                                    type="button">상세페이지#}
+{#                            </button>#}
+{#                        </a>#}
+{#                    </div>#}
+{#                </div>#}
+            </li>
+        </ul>
+    </nav>
+</aside>

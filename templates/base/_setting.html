@@ -1,0 +1,23 @@
+<div class="row mt-4">
+    <div class="col-2">
+
+    </div>
+    <div class="col-10">
+        <div class="row mr-1">
+            <div class="col-10" style="margin-right: -20px;">
+{#                <form class="form-inline my-2 my-lg-0">#}
+                <input v-model="search" class="form-control mr-sm-2" type="search" placeholder="Search Movie" aria-label="Search"
+                           style="width: 100%">
+                    {#<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>#}
+{#                </form>#}
+            </div>
+            <div class="col-2 text-center">
+                <select v-model="selected" class="form-control">
+                    <option>최신순 보기</option>
+                    <option>평점순 보기</option>
+                    <option>관객순 보기</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

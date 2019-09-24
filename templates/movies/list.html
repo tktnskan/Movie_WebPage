@@ -1,0 +1,130 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block body %}
+    {% include 'base/_navbar.html' %}
+    <div id="searchMovie" class="" style="min-height: 85vh">
+        {% include 'base/_main.html' %}
+        <div id="searchBar">
+            {% include 'base/_setting.html' %}
+        </div>
+        <div class="row" style="width: 100%">
+            <div class="container col-2 d-none d-xl-block">
+                {% include 'base/_sidebar.html' %}
+            </div>
+            <div class="container col-lg-10 col-sm-12">
+                <section class="card-row mt-3">
+                    <div class="row">
+                        <div v-for="movie of movies" class="col-xl-3 col-md-4 col-sm-12">
+                            <article class="card mb-5">
+                                <a href="" data-toggle="modal" :data-target=`.bd-${movie.id}-modal-xl`>
+                                    <img @click="getScore(movie.id), getVideo(movie.id)" class="card-img-top"
+                                         v-bind:src="movie.posterUrl"
+                                         alt="Card image cap">
+                                </a>
+                                <div :class="openModal(movie.id)" id="" tabindex="-1" role="dialog"
+                                     aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl">
+                                        <div class="modal-content">
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div style="overflow: auto; height: 70vh;" class="col-4">
+                                                        <a :href=`http://127.0.0.1:8000/movies/${movie.id}/video/detail/`><img
+                                                                @click="getVideoUrl(movie.videoUrl, movieDetail)"
+                                                                v-bind:src="movie.posterUrl" width="100%" alt=""></a>
+                                                    </div>
+                                                    <div style="overflow: auto; height: 70vh;"
+                                                         class="col-4 card-body text-center">
+                                                        <h3>{ movie.movieNm } ({ movie.movieNmEn })</h3>
+                                                        <h3>평점: { movie.avgScore }</h3>
+                                                        <h4>장르: { movie.genre }</h4>
+                                                        <h4>관객수: { movie.audiAcc } 명</h4>
+                                                        <hr/>
+                                                        <h4><strong>줄거리</strong></h4>
+                                                        <h5>{movie.description}</h5>
+                                                    </div>
+
+                                                    <div style="overflow: auto; height: 70vh;" class="col-4">
+                                                        <h3 class="mt-3">댓글</h3>
+                                                        <div v-if="hasUserScore">
+                                                            <h3 class="mt-3">수정하기</h3>
+                                                            <label for="review">나의 댓글</label>
+                                                            <input v-model="inputScore.review" id="review" type="text">
+                                                            <select v-model="inputScore.value">
+                                                                <option v-for="i in 10" :value="i">{ i }</option>
+                                                            </select>
+                                                            <button @click="editScore(movie.id, userScore.id)">수정하기
+                                                            </button>
+                                                        </div>
+                                                        <div v-else>
+                                                            <label for="review">리뷰를 남겨주세요: </label>
+                                                            <input v-model="inputScore.review" id="review" type="text">
+                                                            <select v-model="inputScore.value">
+                                                                <option v-for="i in 10" :value="i">{ i }</option>
+                                                            </select>
+                                                            <button @click="postScore(movie.id)">남기기</button>
+                                                        </div>
+                                                        <hr>
+                                                        {#                                                    <div class="embed-responsive embed-responsive-16by9">#}
+                                                        {#                                                        <iframe class="embed-responsive-item embed-responsive embed-responsive-16by9"#}
+                                                        {#                                                                frameborder="0"#}
+                                                        {#                                                                src="https://www.youtube.com/embed/A3PDXmYoF5U"#}
+                                                        {#                                                                allowscriptaccess="always" allow="autoplay"></iframe>#}
+                                                        {#                                                    </div>#}
+                                                        <ul>
+                                                            <li v-for="score in scores_set.scores">
+                                                                <p v-if="userId === score.user">
+                                                                    <a href="{% url 'accounts:user_detail' user.username %}">{
+                                                                        score.username }</a> : { score.review } (평점: {
+                                                                    score.value })
+                                                                    <button @click="deleteScore(movie.id, score.id)"
+                                                                            class="btn btn-danger">x
+                                                                    </button>
+                                                                </p>
+                                                                <p v-else>
+                                                                    <a :href=`http://127.0.0.1:8000/accounts/user_detail/${score.username}/`>{
+                                                                        score.username } : { score.review } (평점: {
+                                                                        score.value })</a>
+                                                                    {#                                                                <a href="{% url 'accounts:user_detail' user.username %}">{ score.username }</a> : { score.review } (평점: { score.value })#}
+                                                                </p>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {#                            <div class="modal fade" :id="targettrailerUrl" tabindex="-1" role="dialog"#}
+                                {#                                 aria-labelledby="exampleModalLabel" aria-hidden="true">#}
+                                {#                                <div class="modal-dialog modal-xl">#}
+                                {#                                    <div class="modal-content">#}
+                                {#                                        <div class="modal-body mb-0 p-0">#}
+                                {#                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">#}
+                                {#                                                <span aria-hidden="true">&times;</span>#}
+                                {#                                            </button>#}
+                                {#                                            <div class="embed-responsive embed-responsive-16by9">#}
+                                {#                                                <iframe class="embed-responsive-item embed-responsive embed-responsive-16by9 z-depth-1-half"#}
+                                {#                                                        frameborder="0"#}
+                                {#                                                        :src="getStr('https://www.youtube.com/embed/', targettrailerUrl)"#}
+                                {#                                                        allowscriptaccess="always" allow="autoplay"></iframe>#}
+                                {#                                            </div>#}
+                                {#                                        </div>#}
+                                {#                                    </div>#}
+                                {#                                </div>#}
+                                {#                            </div>#}
+                                <div class="card-body text-center">
+                                    <h5 class="card-title"><strong>{movie.movieNm}</strong></h5>
+                                    <p class="card-text">평점: {movie.avgScore}</p>
+                                    <p class="card-text">
+                                        <small class="text-muted">{ movie.audiAcc } 명</small>
+                                    </p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+{% endblock %}
